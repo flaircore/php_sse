@@ -21,4 +21,12 @@
             </div>
         </div>
     </div>
+    <script>
+        // withCredentials=true: pass the cross-domain cookies to server-side
+        const source = new EventSource('http://localhost:8080/sse.php', {withCredentials: true});
+        source.addEventListener('news', function (event) {
+            console.log(event.data);
+            // source.close(); // disconnect stream
+        }, false);
+    </script>
 </div>

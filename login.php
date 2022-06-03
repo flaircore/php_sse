@@ -1,5 +1,11 @@
 <?php
-require_once dirname(__FILE__) . './bootstrap.php';
+/**
+ * @login route, which creates a user and redirects
+ * to home, with the just created user as the $me
+ * variable in index.php.
+ *
+ */
+require_once dirname(__FILE__) . '/bootstrap.php';
 
 if (isset($_POST['submit'])) {
     $user = new \Nick\PhpSse\Entity\User();

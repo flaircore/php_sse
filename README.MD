@@ -1,5 +1,6 @@
 CODE FOR BLOG: Live chat application with Server Sent Events in PHP.
 -------------------------------------------------------------------
+![Initial template](live_chat_sse_dummy_data.PNG)
 
 GETTING STARTED:
 ---------------
@@ -9,4 +10,14 @@ dependencies that the app relies on.
 * Open different (incognito) tabs and open any users already in the `srcdata.sqlite` and load
 different users, like so `http://localhost:8080/index?me=5` and `http://localhost:8080/index?me=1` where 5 and 1
 are real user ids from the users table.
-* 
+
+
+Commands:
+--------
+* `vendor/bin/doctrine orm:schema-tool:create` to create entity schemas in our database as defined in
+ `src/Entity` and `cli-config.php`.
+
+Resources:
+----------
+* Chat template @https://mdbootstrap.com/docs/standard/extended/chat/
+* SSE wrapper @ https://github.com/hhxsv5/php-sse

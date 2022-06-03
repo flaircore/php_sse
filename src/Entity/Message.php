@@ -2,7 +2,10 @@
 
 namespace Nick\PhpSse\Entity;
 
+use Nick\PhpSse\Entity\User;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+
 /**
  * @ORM\Entity
  * @ORM\Table(name="messages")
@@ -17,12 +20,16 @@ class Message
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\ManyToOne(targetEntity="User",inversedBy="messages")
      */
     private $from;
 
     /**
-     * @ORM\OneToMany(targetEntity="User", mappedBy="message")
+     * @ORM\ManyToMany(targetEntity="User")
+     * @ORM\JoinTable(name="messages_id_users_ids",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="message_id", referencedColumnName="id")}
+     * )
      */
     private $to;
 
@@ -41,24 +48,33 @@ class Message
         return $this->id;
     }
 
-    public function getFrom()
+    public function getFrom(): ?User
     {
         return $this->from;
     }
 
-    public function setFrom($from): void
+    public function setFrom(?User $from): void
     {
         $this->from = $from;
     }
 
-    public function getTo(): ArrayCollection
+    public function getTo($id)
     {
-        return $this->to;
+        if (!isset($this->to[$id])) {
+            throw new \InvalidArgumentException("That user was never a recipient to this message.");
+        }
+        return $this->to[$id];
     }
 
-    public function setTo(ArrayCollection $to): void
+    // recipients is $to[]
+    public function getRecipients()
     {
-        $this->to = $to;
+        return $this->to->toArray();
+    }
+
+    public function setTo(User $to): void
+    {
+        $this->to[$to->getId()] = $to;
     }
 
 

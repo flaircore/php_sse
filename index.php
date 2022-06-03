@@ -11,38 +11,53 @@
     <title>Hello, world!</title>
 </head>
 <body>
-<div class="container-sm">
-
+<div class="container-sm" style="height: 100px;">
 
 <?php
-require_once dirname(__FILE__) . './bootstrap.php';
+/**
+ * renders the homepage together
+ * with the chat block(user list)
+ */
+require_once dirname(__FILE__) . '/bootstrap.php';
 $me = [];
-//$fake = new \Nick\PhpSse\BlogFactory();
-//$fake->initGenerate();
+$users = [];
+// $fake = new \Nick\PhpSse\BlogFactory();
+// $fake->initGenerate();
+// $fake->generateFakeMessages();
 $dbConn = new \Nick\PhpSse\DbConn();
+$renderer = new \Nick\PhpSse\Renderer();
 $entityManager = $dbConn->entityManager;
 $uid = (int) $_GET["me"];
-var_dump($uid);
-var_dump($uid);
-var_dump($uid);
-var_dump($uid);
-$qb = $entityManager->createQueryBuilder();
-$user = $qb->select('u.id', 'u.email', 'u.username')
+
+$userQb = $entityManager->createQueryBuilder();
+$usersQb = $entityManager->createQueryBuilder();
+$user = $userQb->select('u.id', 'u.email', 'u.username')
     ->from(\Nick\PhpSse\Entity\User::class, 'u')
     ->where('u.id = :uid')
-    //->orderBy('u.name', 'ASC')
     ->setParameter('uid', $uid)
     ->getQuery()
     ->getResult();
 
-var_dump($user);
-var_dump(htmlspecialchars($_GET["me"]));
-die();
+if (isset($user[0]['id'])) {
+    $me['id'] = $user[0]['id'];
+    $me['username'] = $user[0]['username'];
+    $me['email'] = $user[0]['email'];
+
+
+    $users = $usersQb->select('u.id', 'u.username')
+        ->from(\Nick\PhpSse\Entity\User::class, 'u')
+        //->where($usersQb->expr()->not($usersQb->expr()->eq('u.id', ':uid')))
+        ->where('u.id != :uid')
+        ->orderBy('u.id', 'ASC')
+        ->setParameter('uid', $uid)
+        ->getQuery()
+        ->getArrayResult();
+
+}
 
 if (empty($me)) {
     header("Location: /login.php");
     exit();
-    var_dump($_POST);
     ?>
 
 
@@ -51,9 +66,159 @@ if (empty($me)) {
 
 if (!empty($me)){
     ?>
-    <h1> Username:  <?php  echo($me['username']);?></h1>
+    <span>
+        <h1>Me</h1>
+        <pre>
+        id:  <?php  echo($me['id']);?>
+        username:  <?php  echo($me['username']);?>
+        email:  <?php  echo($me['email']);?>
+        </pre>
+    </span>
+    <h1>Live Chat with Server sent events in PHP!</h1>
+
+    <!--- @todo start here --->
+    <div class="row g-2" style="height: 500px;">
+        <!-- Chat messages -->
+        <div class="col h-100 bg-secondary overflow-scroll">
+            <div class="p-3 border">Messages</div>
+            <?php
+            // load fake template for now
+
+            ?>
+            <div class="card">
+                <div class="card-body">
+
+                    <div class="d-flex flex-row justify-content-start">
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
+                             alt="avatar 1" style="width: 45px; height: 100%;">
+                        <div>
+                            <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">Hi</p>
+                            <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">How are you ...???
+                            </p>
+                            <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">What are you doing
+                                tomorrow? Can we come up a bar?</p>
+                            <p class="small ms-3 mb-3 rounded-3 text-muted">23:58</p>
+                        </div>
+                    </div>
+
+                    <div class="divider d-flex align-items-center mb-4">
+                        <p class="text-center mx-3 mb-0" style="color: #a2aab7;">Today</p>
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-end mb-4 pt-1">
+                        <div>
+                            <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Hiii, I'm good.</p>
+                            <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">How are you doing?</p>
+                            <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Long time no see! Tomorrow
+                                office. will
+                                be free on sunday.</p>
+                            <p class="small me-3 mb-3 rounded-3 text-muted d-flex justify-content-end">00:06</p>
+                        </div>
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp"
+                             alt="avatar 1" style="width: 45px; height: 100%;">
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-start mb-4">
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
+                             alt="avatar 1" style="width: 45px; height: 100%;">
+                        <div>
+                            <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">Okay</p>
+                            <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">We will go on
+                                Sunday?</p>
+                            <p class="small ms-3 mb-3 rounded-3 text-muted">00:07</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-end mb-4">
+                        <div>
+                            <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">That's awesome!</p>
+                            <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">I will meet you Sandon Square
+                                sharp at
+                                10 AM</p>
+                            <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Is that okay?</p>
+                            <p class="small me-3 mb-3 rounded-3 text-muted d-flex justify-content-end">00:09</p>
+                        </div>
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp"
+                             alt="avatar 1" style="width: 45px; height: 100%;">
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-start mb-4">
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
+                             alt="avatar 1" style="width: 45px; height: 100%;">
+                        <div>
+                            <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">Okay i will meet
+                                you on
+                                Sandon Square</p>
+                            <p class="small ms-3 mb-3 rounded-3 text-muted">00:11</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-end mb-4">
+                        <div>
+                            <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Do you have pictures of Matley
+                                Marriage?</p>
+                            <p class="small me-3 mb-3 rounded-3 text-muted d-flex justify-content-end">00:11</p>
+                        </div>
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp"
+                             alt="avatar 1" style="width: 45px; height: 100%;">
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-start mb-4">
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
+                             alt="avatar 1" style="width: 45px; height: 100%;">
+                        <div>
+                            <p class="small p-2 ms-3 mb-1 rounded-3" style="background-color: #f5f6f7;">Sorry I don't
+                                have. i
+                                changed my phone.</p>
+                            <p class="small ms-3 mb-3 rounded-3 text-muted">00:13</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-row justify-content-end">
+                        <div>
+                            <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">Okay then see you on sunday!!
+                            </p>
+                            <p class="small me-3 mb-3 rounded-3 text-muted d-flex justify-content-end">00:15</p>
+                        </div>
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava4-bg.webp"
+                             alt="avatar 1" style="width: 45px; height: 100%;">
+                    </div>
+
+                </div>
+                <div class="card-footer text-muted d-flex justify-content-start align-items-center p-3">
+                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp"
+                         alt="avatar 3" style="width: 40px; height: 100%;">
+                    <input type="text" class="form-control form-control-lg" id="exampleFormControlInput1"
+                           placeholder="Type message">
+                    <a class="ms-1 text-muted" href="#!"><i class="fas fa-paperclip"></i></a>
+                    <a class="ms-3 text-muted" href="#!"><i class="fas fa-smile"></i></a>
+                    <a class="ms-3" href="#!"><i class="fas fa-paper-plane"></i></a>
+                </div>
+            </div>
+        </div>
+        <!-- users list -->
+        <div class="col-4 h-100 text-center overflow-scroll">
+            <div class="p-2 border">
+                <div class="card-body">
+                    <h5 class="card-title">Users</h5>
+
+                </div>
+                <div class="card w-100">
+                    <?php echo $renderer->renderList($users); ?>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // withCredentials=true: pass the cross-domain cookies to server-side
+            const source = new EventSource('http://localhost:8080/sse.php', {withCredentials: true});
+            source.addEventListener('news', function (event) {
+                console.log(event.data);
+                // source.close(); // disconnect stream
+            }, false);
+        </script>
+    </div>
     <?php
-    readfile("chat.html");
 
 }
 

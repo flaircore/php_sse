@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__FILE__) . './bootstrap.php';
+require_once dirname(__FILE__) . '/bootstrap.php';
 use Hhxsv5\SSE\Event;
 use Hhxsv5\SSE\SSE;
 use Hhxsv5\SSE\StopSSEException;
