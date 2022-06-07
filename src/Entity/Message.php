@@ -67,7 +67,7 @@ class Message
     }
 
     // recipients is $to[]
-    public function getRecipients()
+    public function getRecipients(): array
     {
         return $this->to->toArray();
     }
