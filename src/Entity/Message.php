@@ -25,10 +25,10 @@ class Message
     private $from;
 
     /**
-     * @ORM\ManyToMany(targetEntity="User")
+     * @ORM\ManyToMany(targetEntity="User", inversedBy="messages")
      * @ORM\JoinTable(name="messages_id_users_ids",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="message_id", referencedColumnName="id")}
+     *      joinColumns={@ORM\JoinColumn(name="message_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
      * )
      */
     private $to;
@@ -72,6 +72,9 @@ class Message
         return $this->to->toArray();
     }
 
+    // @todo param should be an ArrayCollection
+    // where we loop through each item in the
+    // array, but we keep it simple for now.
     public function setTo(User $to): void
     {
         $this->to[$to->getId()] = $to;

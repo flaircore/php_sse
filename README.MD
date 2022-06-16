@@ -21,3 +21,4 @@ Resources:
 ----------
 * Chat template @https://mdbootstrap.com/docs/standard/extended/chat/
 * SSE wrapper @ https://github.com/hhxsv5/php-sse
+* Adding timestamps @ https://gist.github.com/muzfr7/7ec1b726702e3d353e83246dce22eab3
